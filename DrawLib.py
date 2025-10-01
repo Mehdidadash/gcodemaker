@@ -96,7 +96,7 @@ o202 endif
         file.write("g0 x1\n")
         file.write("g94 g01 x.65 f80\n")
         file.write(dashseven)
-        file.write("g94 g01 x[" + f"{xvalue:.5f}"  + "+#7*[#11-" + f"{xvalue:.5f}"  + "]] c360 f8\n")
+        file.write("g94 g01 x[" + f"{xvalue:.5f}"  + "+#7*[0.15+#11-" + f"{xvalue:.5f}"  + "]] c360 f8\n")
         file.write(dashseventwo)
         file.write("g94 g01 x[" + f"{xvalue:.5f}"  + "+#7*[#11-" + f"{xvalue:.5f}"  + "]] f8\n")
         for i in range(0, len(z)):
@@ -133,18 +133,14 @@ o200 if [#3 EQ 3 AND #2 EQ #5]
 (DEBUG, #10 dash 13 end)
 o200 else
 o201 if [#3 EQ 1]
-g92 c[#10]
-g0 c120
+g0 z0 c120
 o201 elseif [#3 EQ 2]
-g92 c[#10+120]
-g0 c240
+g0 z0 c120
 o201 else
-g92 c[#10+240]
-g0 c0
+g0 z0 c120
 o201 endif
 (DEBUG, #12 dash 12 at d2 #2 and d3 #3)
 g92 c0
-G0 z0 C0 (changed to g1 for first test run)
 o200 endif
 """
 
