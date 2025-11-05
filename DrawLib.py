@@ -117,7 +117,6 @@ o202 endif
             line = (
                 f"g93 g01 x[{xvalue:.5f}+#7*[#11-{xvalue:.5f}]] "
                 f"z{-zvalue:.5f} "
-                f"a{avalue:.5f} "
                 f"c{-cvalue:.5f} "
                 f"f[{fvalue:.5f}]\n"
             )
