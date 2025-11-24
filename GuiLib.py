@@ -64,7 +64,7 @@ def get_next_eslah_filename(folder, file_type):
             max_number = max(max_number, number)
     return os.path.join(folder, f"{file_type}-ESLH-{max_number + 1}.txt")
 
-def Create_Eslah(folder, file_type, read_count):
+def create_eslah(folder, file_type, read_count):
     """Read last read_count columns from all_raw_results.csv, compute row averages,
     subtract from Diameters in StandardDimentions/{file_type}/{file_type}.txt,
     and save results to StandardDimentions/{file_type}/{file_type}-ESLH-{n}.txt."""
@@ -95,6 +95,12 @@ def Create_Eslah(folder, file_type, read_count):
             if not rows:
                 sg.popup_error("No data rows in CSV")
                 return
+            
+            # For SX type, use only first 13 rows (0-12)
+            if file_type.upper() == "SX":
+                rows = rows[:13]  # Keep only rows 0-12
+                print(f"SX detected - using first 13 rows out of {len(data)-1} total rows")
+            
             # Convert to float and compute row averages
             actual_dia = []
             for row in rows:
@@ -112,6 +118,12 @@ def Create_Eslah(folder, file_type, read_count):
         try:
             data = Stnds.read_info(file_type, base_dir=os.path.join(folder, "StandardDimentions"))
             diameters = data['arrays']['Diameters'][:, 1]  # Extract second column
+            
+            # For SX type, use only first 13 diameters (0-12)
+            if file_type.upper() == "SX":
+                diameters = diameters[:13]  # Keep only diameters 0-12
+                print(f"SX detected - using first 13 diameters out of {len(data['arrays']['Diameters'])} total diameters")
+                
         except FileNotFoundError as e:
             sg.popup_error(f"File not found: {e}")
             return
@@ -132,7 +144,7 @@ def Create_Eslah(folder, file_type, read_count):
 
         # Adjust first and last rows
         if len(differences) >= 2:
-            differences[0] = (differences[0]+differences[1])/2  # First row = second row
+            differences[0] = (2*differences[0]+differences[1])/3  # First row = second row
             differences[-1] = differences[-2]  # Last row = second-to-last row
 
         # Save results to StandardDimentions/{file_type}/{file_type}-ESLH-{n}.txt
@@ -140,13 +152,13 @@ def Create_Eslah(folder, file_type, read_count):
         output_file = get_next_eslah_filename(output_dir, file_type)
         try:
             np.savetxt(output_file, differences, fmt='%.4f')  # No header
-            #sg.popup_ok(f"Results saved to {output_file}")
+            sg.popup_ok(f"Results saved to {output_file}\nSX: Used first 13 rows (0-12) out of 17 total")
         except Exception as e:
             sg.popup_error(f"Failed to save results: {e}")
 
     except Exception as e:
-        logging.error(f"Error in Create_Eslah: {e}")
-        sg.popup_error(f"Error in Create_Eslah: {e}")
+        logging.error(f"Error in create_eslah: {e}")
+        sg.popup_error(f"Error in create_eslah: {e}")
 
 def MainGUI():
     FileType = []
@@ -322,7 +334,7 @@ def MainGUI():
                         if read_count <= 0:
                             sg.popup_error("Read Count must be a positive integer")
                             continue
-                        Create_Eslah(values["-FolderDir-"], FileType, read_count)
+                        create_eslah(values["-FolderDir-"], FileType, read_count)
                     except ValueError:
                         sg.popup_error("Read Count must be a valid integer")
                     except Exception as e:

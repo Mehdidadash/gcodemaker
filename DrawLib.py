@@ -129,7 +129,6 @@ o202 endif
         file.write("g0 x1\n")
         conditional_block = """\
 o200 if [#3 EQ 3 AND #2 EQ #5]
-(DEBUG, #10 dash 13 end)
 o200 else
 o201 if [#3 EQ 1]
 g0 z0 c120
@@ -138,7 +137,6 @@ g0 z0 c120
 o201 else
 g0 z0 c120
 o201 endif
-(DEBUG, #12 dash 12 at d2 #2 and d3 #3)
 g92 c0
 o200 endif
 """
